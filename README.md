@@ -1,35 +1,48 @@
 # AI-Sales-Forecasting-Platform
 
-AI-Driven-Regional-Sales-Intelligence-Forecasting-Platform-with-Multi-Modal-Analytics.
 
-📋 Table of Contents
-Project ture
-Tech Stack
-Notebooks
-Dashboard
-Key Insights
-Setup & Usage
-Recommendations
+## 📋 Table of Contents
 
-🎯 Project Overview
+- [Project ture](#-repository-structure)
+- [Tech Stack](#-tech-stack)
+- [Notebooks](#-notebooks)
+- [Dashboard](#-dashboard)
+- [Key Insights](#-key-insights)
+- [Setup & Usage](#-setup--usage)
+- [Recommendations](#-recommendations)
+
+---
+
+## 🎯 Project Overview
+
 This project addresses three core business questions for Acme Co.:
 
-Where are the strongest and weakest sales regions, products, and channels?
-What will revenue look like over the next 6 months?
-How do customers feel about products — and what do they say?
+1. **Where** are the strongest and weakest sales regions, products, and channels?
+2. **What** will revenue look like over the next 6 months?
+3. **How** do customers feel about products — and what do they say?
+
 The pipeline flows from raw data → cleaning → feature engineering → EDA → ML forecasting → NLP sentiment → interactive dashboard.
 
-📊 Key Results
-Metric	Value
-Dataset Size	5,000 transactions × 15 features
-Time Span	January 2014 – December 2017
-Total Revenue	~$1.2B across all regions
-Best ML Model	Gradient Boosting Regressor
-Forecast Horizon	6 months ahead
-Top Region	West (~35% of revenue)
-Top Product	Product 26 (~$118M revenue)
-Best Sales Channel (Margin)	Export (~37.9% avg margin)
-🗂️ Repository Structure
+---
+
+## 📊 Key Results
+
+| Metric | Value |
+|---|---|
+| Dataset Size | 5,000 transactions × 15 features |
+| Time Span | January 2014 – December 2017 |
+| Total Revenue | ~$1.2B across all regions |
+| Best ML Model | Gradient Boosting Regressor |
+| Forecast Horizon | 6 months ahead |
+| Top Region | **West** (~35% of revenue) |
+| Top Product | **Product 26** (~$118M revenue) |
+| Best Sales Channel (Margin) | **Export** (~37.9% avg margin) |
+
+---
+
+## 🗂️ Repository Structure
+
+```
 ├── notebooks/
 │   ├── EDA_Regional_Sales_Analysis.ipynb          # Exploratory Data Analysis
 │   └── AI_Forecasting_MultiModal_Platform.ipynb   # ML Forecasting + NLP
@@ -46,101 +59,145 @@ Best Sales Channel (Margin)	Export (~37.9% avg margin)
 │   └── model_comparison.csv
 │
 └── README.md
+```
 
-🛠 Tech Stack
-Layer	Tools
-Data Wrangling	Python, Pandas, NumPy
-Visualization	Matplotlib, Seaborn
-Machine Learning	scikit-learn (LinearRegression, Ridge, RandomForest, GradientBoosting)
-NLP	TextBlob (polarity scoring), Counter (word frequency)
-Dashboard	Power BI (.pbix), HTML/CSS/JS
-Environment	Jupyter Notebook
+---
 
-📓 Notebooks
-1. EDA_Regional_Sales_Analysis.ipynb
+## 🛠 Tech Stack
+
+| Layer | Tools |
+|---|---|
+| **Data Wrangling** | Python, Pandas, NumPy |
+| **Visualization** | Matplotlib, Seaborn |
+| **Machine Learning** | scikit-learn (LinearRegression, Ridge, RandomForest, GradientBoosting) |
+| **NLP** | TextBlob (polarity scoring), Counter (word frequency) |
+| **Dashboard** | Power BI (`.pbix`), HTML/CSS/JS |
+| **Environment** | Jupyter Notebook |
+
+---
+
+## 📓 Notebooks
+
+### 1. `EDA_Regional_Sales_Analysis.ipynb`
+
 Comprehensive exploratory analysis across 15 charts and dimensions:
 
-Monthly & yearly revenue trends (2014–2017)
-Top 10 products by revenue and margin
-Regional and state-level breakdown (West / South / Midwest / Northeast)
-Sales channel comparison (Wholesale, Distributor, Export)
-Customer segmentation: revenue vs. profit margin bubble chart
-Outlier detection on unit pricing
-Correlation heatmap of key numeric features
-Key EDA Insight: Revenue cycles stably between $23M–$26.5M/month. California leads all states at ~$230M. Export channel achieves the highest average margin (~37.9%) despite being the smallest channel (15% of orders).
+- Monthly & yearly revenue trends (2014–2017)
+- Top 10 products by revenue and margin
+- Regional and state-level breakdown (West / South / Midwest / Northeast)
+- Sales channel comparison (Wholesale, Distributor, Export)
+- Customer segmentation: revenue vs. profit margin bubble chart
+- Outlier detection on unit pricing
+- Correlation heatmap of key numeric features
 
-2. AI_Forecasting_MultiModal_Platform.ipynb
+**Key EDA Insight:** Revenue cycles stably between $23M–$26.5M/month. California leads all states at ~$230M. Export channel achieves the highest average margin (~37.9%) despite being the smallest channel (15% of orders).
+
+---
+
+### 2. `AI_Forecasting_MultiModal_Platform.ipynb`
+
 Full-stack AI platform with five integrated modules:
 
-Module 1 — Synthetic Data Generation Realistic 4-year dataset: 16 states, 8 products, 4 channels, seasonal pricing uplift.
+**Module 1 — Synthetic Data Generation**
+Realistic 4-year dataset: 16 states, 8 products, 4 channels, seasonal pricing uplift.
 
-Module 2 — Feature Engineering Time features (year, quarter, month, week), financial KPIs (profit, margin %), rolling 3-month averages, budget gap analysis.
+**Module 2 — Feature Engineering**
+Time features (year, quarter, month, week), financial KPIs (profit, margin %), rolling 3-month averages, budget gap analysis.
 
-Module 3 — ML Sales Forecasting Four models benchmarked via cross-validation:
+**Module 3 — ML Sales Forecasting**
+Four models benchmarked via cross-validation:
 
-Model	Notes
-Linear Regression	Baseline
-Ridge Regression	L2-regularized
-Random Forest	Ensemble tree method
-Gradient Boosting	✅ Best performer
-Strongest predictors: Lag-1 revenue and 3-month rolling average.
+| Model | Notes |
+|---|---|
+| Linear Regression | Baseline |
+| Ridge Regression | L2-regularized |
+| Random Forest | Ensemble tree method |
+| **Gradient Boosting** | ✅ Best performer |
 
-Module 4 — Regional Intelligence Layer State-level revenue heatmaps, YoY growth flags, risk-threshold analysis (< 30% margin = at-risk region).
+Strongest predictors: **Lag-1 revenue** and **3-month rolling average**.
 
-Module 5 — NLP Sentiment Analysis Synthetic customer reviews → TextBlob polarity scoring → Positive / Neutral / Negative classification per product and region. Word frequency analysis reveals top positive and negative review keywords.
+**Module 4 — Regional Intelligence Layer**
+State-level revenue heatmaps, YoY growth flags, risk-threshold analysis (< 30% margin = at-risk region).
 
-📈 Dashboard
-Power BI (SALES_REPORT.pbix)
+**Module 5 — NLP Sentiment Analysis**
+Synthetic customer reviews → TextBlob polarity scoring → Positive / Neutral / Negative classification per product and region. Word frequency analysis reveals top positive and negative review keywords.
+
+---
+
+## 📈 Dashboard
+
+### Power BI (`SALES_REPORT.pbix`)
 Interactive report with slicers for region, product, year, and channel. Includes KPI cards, trend lines, map visuals, and budget vs. actual comparison.
 
-HTML Dashboard (AI_Sales_Intelligence_Dashboard.html)
+### HTML Dashboard (`AI_Sales_Intelligence_Dashboard.html`)
 Self-contained standalone file — open in any browser, no server required. Includes the same KPI cards and 4-panel summary visualization generated by the AI platform notebook.
 
-KPIs surfaced on the dashboard:
+**KPIs surfaced on the dashboard:**
+- Total Revenue, Total Profit, Avg Margin %, Total Orders
+- Top Region, Top Product
 
-Total Revenue, Total Profit, Avg Margin %, Total Orders
-Top Region, Top Product
-💡 Key Insights
-📈 Revenue & Forecasting
-Revenue is stable at ~$23M–$26.5M/month with a clear seasonal trough in January and peak in May–June.
-A sharp dip in early 2017 is an outlier requiring business-level investigation.
-Gradient Boosting outperforms all other models; lag features are the dominant signal.
-6-month forward projection shows revenue holding at the current run rate.
-🗺️ Regional Performance
-West dominates at ~35% of total revenue; California alone accounts for ~$230M.
-Northeast underperforms at ~20% — the highest untapped growth opportunity.
-Midwest shows YoY volatility that warrants closer monitoring.
-🛍️ Product & Channel
-Product 26 ($118M) and Product 25 ($110M) are the revenue anchors.
-Export channel delivers the highest margin (~37.9%) despite lowest volume (15%).
-Products 8, 17, 27 show high-end pricing outliers — review pricing strategy.
-💬 Customer Sentiment
-Positive reviews dominate across all regions.
-Northeast shows the highest proportion of negative sentiment — aligns with the revenue underperformance signal.
-Top pain points: product quality and packaging (negative keyword frequency analysis).
-⚙️ Setup & Usage
-Prerequisites
+---
+
+## 💡 Key Insights
+
+### 📈 Revenue & Forecasting
+- Revenue is stable at ~$23M–$26.5M/month with a clear seasonal trough in January and peak in May–June.
+- A sharp dip in early 2017 is an outlier requiring business-level investigation.
+- Gradient Boosting outperforms all other models; lag features are the dominant signal.
+- 6-month forward projection shows revenue holding at the current run rate.
+
+### 🗺️ Regional Performance
+- **West dominates** at ~35% of total revenue; California alone accounts for ~$230M.
+- **Northeast underperforms** at ~20% — the highest untapped growth opportunity.
+- **Midwest** shows YoY volatility that warrants closer monitoring.
+
+### 🛍️ Product & Channel
+- Product 26 ($118M) and Product 25 ($110M) are the revenue anchors.
+- Export channel delivers the highest margin (~37.9%) despite lowest volume (15%).
+- Products 8, 17, 27 show high-end pricing outliers — review pricing strategy.
+
+### 💬 Customer Sentiment
+- Positive reviews dominate across all regions.
+- **Northeast** shows the highest proportion of negative sentiment — aligns with the revenue underperformance signal.
+- Top pain points: **product quality** and **packaging** (negative keyword frequency analysis).
+
+---
+
+## ⚙️ Setup & Usage
+
+### Prerequisites
+```bash
 pip install pandas numpy matplotlib seaborn scikit-learn textblob
 python -m textblob.download_corpora
-Run Notebooks (in order)
+```
 
+### Run Notebooks (in order)
+```bash
 # Step 1 — EDA
 jupyter notebook notebooks/EDA_Regional_Sales_Analysis.ipynb
 
 # Step 2 — AI Forecasting + NLP
 jupyter notebook notebooks/AI_Forecasting_MultiModal_Platform.ipynb
-View Dashboard
+```
+
+### View Dashboard
+```bash
 # Option A — Power BI Desktop
 open dashboard/SALES_REPORT.pbix
 
 # Option B — Standalone HTML
 open dashboard/AI_Sales_Intelligence_Dashboard.html
-Note: Both notebooks generate synthetic data internally and run end-to-end without any external data file dependencies. To use real data, replace the data generation cell with df = pd.read_excel('your_file.xlsx').
+```
 
-✅ Recommendations
-Deploy Gradient Boosting model in production for monthly revenue forecasting.
-Invest in the Northeast — launch targeted local promotions and distributor partnerships to close the ~15% revenue gap vs. West.
-Scale the Export channel — it has the highest margin; earmark budget for international marketing and logistics.
-Resolve product quality issues surfaced in negative reviews before the next sales cycle.
-Exclude outlier transactions (promotional SKUs) from average margin calculations for accurate reporting.
-Investigate the 2017 revenue anomaly — the early-year dip may signal a supply chain, pricing, or macro event.
+> **Note:** Both notebooks generate synthetic data internally and run end-to-end without any external data file dependencies. To use real data, replace the data generation cell with `df = pd.read_excel('your_file.xlsx')`.
+
+---
+
+## ✅ Recommendations
+
+1. **Deploy Gradient Boosting** model in production for monthly revenue forecasting.
+2. **Invest in the Northeast** — launch targeted local promotions and distributor partnerships to close the ~15% revenue gap vs. West.
+3. **Scale the Export channel** — it has the highest margin; earmark budget for international marketing and logistics.
+4. **Resolve product quality issues** surfaced in negative reviews before the next sales cycle.
+5. **Exclude outlier transactions** (promotional SKUs) from average margin calculations for accurate reporting.
+6. **Investigate the 2017 revenue anomaly** — the early-year dip may signal a supply chain, pricing, or macro event.
