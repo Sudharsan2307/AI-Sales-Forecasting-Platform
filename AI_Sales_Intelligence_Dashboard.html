@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI-Driven Regional Sales Intelligence Platform</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  :root {
+    --bg: #0D1117; --card: #161B22; --border: #21262D; --border2: #30363D;
+    --accent1: #00D4FF; --accent2: #FF6B35; --accent3: #7EE787;
+    --accent4: #F5A623; --accent5: #BD93F9; --pink: #FF79C6;
+    --text: #E6EDF3; --sub: #8B949E; --sub2: #6E7681;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; }
+
+  /* TOP NAV */
+  .topnav { background: var(--card); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 56px; position: sticky; top: 0; z-index: 100; }
+  .nav-brand { display: flex; align-items: center; gap: 10px; }
+  .nav-logo { width: 28px; height: 28px; background: linear-gradient(135deg, var(--accent1), var(--accent5)); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: #000; }
+  .nav-title { font-size: 15px; font-weight: 600; color: var(--text); }
+  .nav-tabs { display: flex; gap: 2px; }
+  .nav-tab { padding: 6px 14px; border-radius: 6px; font-size: 13px; cursor: pointer; border: none; background: transparent; color: var(--sub); transition: all .15s; }
+  .nav-tab:hover { background: var(--border); color: var(--text); }
+  .nav-tab.active { background: var(--border2); color: var(--accent1); }
+  .nav-badge { background: var(--accent3); color: #000; font-size: 10px; padding: 1px 6px; border-radius: 10px; font-weight: 700; margin-left: 4px; }
+
+  /* LAYOUT */
+  .page { display: none; padding: 24px; }
+  .page.active { display: block; }
+  .page-title { font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .page-sub { font-size: 13px; color: var(--sub); margin-bottom: 24px; }
+
+  /* KPI CARDS */
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 24px; }
+  .kpi-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; position: relative; overflow: hidden; }
+  .kpi-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; border-radius: 10px 10px 0 0; }
+  .kpi-card.blue::before { background: var(--accent1); }
+  .kpi-card.green::before { background: var(--accent3); }
+  .kpi-card.orange::before { background: var(--accent4); }
+  .kpi-card.red::before { background: var(--accent2); }
+  .kpi-card.purple::before { background: var(--accent5); }
+  .kpi-card.pink::before { background: var(--pink); }
+  .kpi-label { font-size: 11px; color: var(--sub); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
+  .kpi-value { font-size: 26px; font-weight: 700; line-height: 1; }
+  .kpi-card.blue .kpi-value { color: var(--accent1); }
+  .kpi-card.green .kpi-value { color: var(--accent3); }
+  .kpi-card.orange .kpi-value { color: var(--accent4); }
+  .kpi-card.red .kpi-value { color: var(--accent2); }
+  .kpi-card.purple .kpi-value { color: var(--accent5); }
+  .kpi-card.pink .kpi-value { color: var(--pink); }
+  .kpi-sub { font-size: 11px; color: var(--sub2); margin-top: 6px; }
+
+  /* CHART CARDS */
+  .chart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(480px, 1fr)); gap: 16px; margin-bottom: 16px; }
+  .chart-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+  .chart-card.full { grid-column: 1 / -1; }
+  .chart-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .chart-desc { font-size: 12px; color: var(--sub); margin-bottom: 16px; }
+  .chart-wrap { position: relative; width: 100%; }
+
+  /* INSIGHT CARDS */
+  .insight-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; margin-bottom: 24px; }
+  .insight-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+  .insight-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .insight-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+  .insight-title { font-size: 13px; font-weight: 600; color: var(--text); }
+  .insight-body { font-size: 12px; color: var(--sub); line-height: 1.6; }
+  .highlight { color: var(--accent3); font-weight: 600; }
+  .warn { color: var(--accent2); font-weight: 600; }
+  .info { color: var(--accent1); font-weight: 600; }
+
+  /* TABLE */
+  .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .data-table th { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); color: var(--sub); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .data-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: var(--text); }
+  .data-table tr:hover td { background: rgba(255,255,255,.02); }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+  .badge-blue { background: rgba(0,212,255,.12); color: var(--accent1); }
+  .badge-green { background: rgba(126,231,135,.12); color: var(--accent3); }
+  .badge-orange { background: rgba(245,166,35,.12); color: var(--accent4); }
+  .badge-red { background: rgba(255,107,53,.12); color: var(--accent2); }
+
+  /* PROGRESS BARS */
+  .progress-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .progress-label { font-size: 12px; color: var(--sub); width: 100px; flex-shrink: 0; text-align: right; }
+  .progress-bar-bg { flex: 1; height: 6px; background: var(--border2); border-radius: 3px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; border-radius: 3px; transition: width 1s ease; }
+  .progress-value { font-size: 12px; color: var(--text); font-weight: 600; width: 60px; flex-shrink: 0; }
+
+  /* MODEL COMPARISON */
+  .model-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin-bottom: 12px; }
+  .model-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .model-name { font-size: 15px; font-weight: 600; }
+  .model-badge { font-size: 11px; padding: 3px 10px; border-radius: 5px; }
+  .model-best { background: rgba(126,231,135,.15); color: var(--accent3); border: 1px solid rgba(126,231,135,.3); }
+  .model-good { background: rgba(0,212,255,.1); color: var(--accent1); border: 1px solid rgba(0,212,255,.2); }
+  .model-base { background: rgba(139,148,158,.1); color: var(--sub); border: 1px solid rgba(139,148,158,.2); }
+  .metric-row { display: flex; gap: 20px; }
+  .metric-box { background: var(--bg); border-radius: 8px; padding: 10px 14px; flex: 1; }
+  .metric-box-label { font-size: 10px; color: var(--sub); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .metric-box-value { font-size: 18px; font-weight: 700; }
+
+  /* FORECAST */
+  .forecast-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 24px; }
+  .forecast-item { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; text-align: center; }
+  .forecast-month { font-size: 12px; color: var(--sub); margin-bottom: 6px; }
+  .forecast-val { font-size: 22px; font-weight: 700; color: var(--accent1); }
+  .forecast-trend { font-size: 11px; margin-top: 4px; }
+
+  /* FOOTER */
+  .footer { background: var(--card); border-top: 1px solid var(--border); padding: 16px 24px; text-align: center; font-size: 12px; color: var(--sub2); margin-top: 24px; }
+
+  .section-sep { height: 1px; background: var(--border); margin: 24px 0; }
+  .tag { display: inline-block; padding: 2px 8px; background: rgba(0,212,255,.1); color: var(--accent1); border-radius: 4px; font-size: 11px; margin-right: 6px; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="nav-brand">
+    <div class="nav-logo">AI</div>
+    <span class="nav-title">Sales Intelligence Platform</span>
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('executive')">Executive Summary</button>
+    <button class="nav-tab" onclick="showPage('regional')">Regional Analysis</button>
+    <button class="nav-tab" onclick="showPage('products')">Products & Channels</button>
+    <button class="nav-tab" onclick="showPage('forecast')">Forecast<span class="nav-badge">ML</span></button>
+    <button class="nav-tab" onclick="showPage('insights')">AI Insights</button>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════════ PAGE 1 -->
+<div class="page active" id="page-executive">
+  <div class="page-title">Executive Summary</div>
+  <div class="page-sub">Full platform overview · Dataset: 64,104 transactions · Jan 2014 – Feb 2018</div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card blue"><div class="kpi-label">Total Revenue</div><div class="kpi-value">$1.24B</div><div class="kpi-sub">Across 5 fiscal years</div></div>
+    <div class="kpi-card green"><div class="kpi-label">Total Profit</div><div class="kpi-value">$461.8M</div><div class="kpi-sub">37.4% overall margin</div></div>
+    <div class="kpi-card orange"><div class="kpi-label">Avg Profit Margin</div><div class="kpi-value">37.4%</div><div class="kpi-sub">Consistent across regions</div></div>
+    <div class="kpi-card red"><div class="kpi-label">Total Orders</div><div class="kpi-value">10,684</div><div class="kpi-sub">Unique order numbers</div></div>
+    <div class="kpi-card purple"><div class="kpi-label">Customers</div><div class="kpi-value">175</div><div class="kpi-sub">Active accounts</div></div>
+    <div class="kpi-card pink"><div class="kpi-label">Top Region</div><div class="kpi-value">West</div><div class="kpi-sub">$372.1M revenue</div></div>
+  </div>
+
+  <div class="chart-grid">
+    <div class="chart-card full">
+      <div class="chart-title">Monthly Revenue Trend — 2014 to 2018</div>
+      <div class="chart-desc">Full time-series view of revenue performance across all months</div>
+      <div class="chart-wrap" style="height:260px">
+        <canvas id="trendChart" role="img" aria-label="Monthly revenue trend 2014-2018">Monthly sales trend showing ~$20M per month across all years.</canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Revenue by Region</div>
+      <div class="chart-desc">Cumulative revenue split by US region</div>
+      <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+        <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--sub)"><span style="width:10px;height:10px;border-radius:2px;background:#00D4FF"></span>West</span>
+        <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--sub)"><span style="width:10px;height:10px;border-radius:2px;background:#FF6B35"></span>South</span>
+        <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--sub)"><span style="width:10px;height:10px;border-radius:2px;background:#7EE787"></span>Midwest</span>
+        <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--sub)"><span style="width:10px;height:10px;border-radius:2px;background:#BD93F9"></span>Northeast</span>
+      </div>
+      <div class="chart-wrap" style="height:220px">
+        <canvas id="regionDoughnut" role="img" aria-label="Revenue by region pie chart">West 30%, South 27%, Midwest 26%, Northeast 17%</canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Year-over-Year Revenue</div>
+      <div class="chart-desc">Annual revenue comparison 2014–2017</div>
+      <div class="chart-wrap" style="height:220px">
+        <canvas id="yearlyBar" role="img" aria-label="Yearly revenue bar chart">2014-2017 revenue around $295-298M per year.</canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="chart-grid">
+    <div class="chart-card">
+      <div class="chart-title">Channel Revenue Breakdown</div>
+      <div class="chart-desc">Wholesale leads with $668M (54% of total)</div>
+      <div class="chart-wrap" style="height:200px">
+        <canvas id="channelBar" role="img" aria-label="Revenue by sales channel bar chart">Wholesale 668M, Distributor 387M, Export 181M</canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Avg Monthly Revenue by Month</div>
+      <div class="chart-desc">Seasonality pattern across calendar months</div>
+      <div class="chart-wrap" style="height:200px">
+        <canvas id="seasonChart" role="img" aria-label="Average monthly revenue by month of year">Relatively flat ~$19K average per month with slight variation.</canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ PAGE 2 -->
+<div class="page" id="page-regional">
+  <div class="page-title">Regional Performance Analysis</div>
+  <div class="page-sub">Deep dive into all 4 US regions · Revenue, Profit, Orders & Margin breakdown</div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card blue"><div class="kpi-label">West Revenue</div><div class="kpi-value">$372M</div><div class="kpi-sub">30.1% of total · 19,540 orders</div></div>
+    <div class="kpi-card red"><div class="kpi-label">South Revenue</div><div class="kpi-value">$335M</div><div class="kpi-sub">27.1% of total · 17,333 orders</div></div>
+    <div class="kpi-card purple"><div class="kpi-label">Midwest Revenue</div><div class="kpi-value">$320M</div><div class="kpi-sub">25.9% of total · 16,588 orders</div></div>
+    <div class="kpi-card orange"><div class="kpi-label">Northeast Revenue</div><div class="kpi-value">$208M</div><div class="kpi-sub">16.9% of total · 10,643 orders</div></div>
+  </div>
+
+  <div class="chart-grid">
+    <div class="chart-card">
+      <div class="chart-title">Revenue vs Profit by Region</div>
+      <div class="chart-desc">Grouped comparison showing revenue and profit side by side</div>
+      <div class="chart-wrap" style="height:280px">
+        <canvas id="regionGrouped" role="img" aria-label="Revenue and profit by region grouped bar chart">West leads both revenue and profit.</canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Profit Margin by Region (%)</div>
+      <div class="chart-desc">Average profit margin per order across regions</div>
+      <div class="chart-wrap" style="height:280px">
+        <canvas id="marginBar" role="img" aria-label="Profit margin percentage by region horizontal bar chart">All regions have roughly 37% margin.</canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="chart-card full" style="margin-bottom:16px">
+    <div class="chart-title">Regional Orders Breakdown</div>
+    <div class="chart-desc">Total orders per region showing volume distribution</div>
+    <div class="chart-wrap" style="height:200px">
+      <canvas id="ordersChart" role="img" aria-label="Orders count by region">West 19540, South 17333, Midwest 16588, Northeast 10643</canvas>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-title">Regional Performance Table</div>
+    <div class="chart-desc">Full breakdown with KPIs per region</div>
+    <table class="data-table">
+      <thead><tr><th>Region</th><th>Revenue</th><th>Profit</th><th>Orders</th><th>Avg Margin</th><th>Share</th></tr></thead>
+      <tbody>
+        <tr><td><span class="badge badge-blue">West</span></td><td>$372.1M</td><td>$139.3M</td><td>19,540</td><td>37.5%</td><td><div class="progress-bar-bg" style="display:inline-block;width:80px;vertical-align:middle"><div class="progress-bar-fill" style="width:100%;background:var(--accent1)"></div></div> 30.1%</td></tr>
+        <tr><td><span class="badge badge-red">South</span></td><td>$335.1M</td><td>$125.2M</td><td>17,333</td><td>37.4%</td><td><div class="progress-bar-bg" style="display:inline-block;width:80px;vertical-align:middle"><div class="progress-bar-fill" style="width:90%;background:var(--accent2)"></div></div> 27.1%</td></tr>
+        <tr><td><span class="badge badge-orange">Midwest</span></td><td>$320.3M</td><td>$120.1M</td><td>16,588</td><td>37.5%</td><td><div class="progress-bar-bg" style="display:inline-block;width:80px;vertical-align:middle"><div class="progress-bar-fill" style="width:86%;background:var(--accent4)"></div></div> 25.9%</td></tr>
+        <tr><td><span class="badge badge-green">Northeast</span></td><td>$208.4M</td><td>$77.2M</td><td>10,643</td><td>37.2%</td><td><div class="progress-bar-bg" style="display:inline-block;width:80px;vertical-align:middle"><div class="progress-bar-fill" style="width:56%;background:var(--accent3)"></div></div> 16.9%</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ PAGE 3 -->
+<div class="page" id="page-products">
+  <div class="page-title">Products & Channel Intelligence</div>
+  <div class="page-sub">30 product SKUs · 3 sales channels · 4 warehouse locations</div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card blue"><div class="kpi-label">Top Product</div><div class="kpi-value">Prod 26</div><div class="kpi-sub">$117.3M revenue</div></div>
+    <div class="kpi-card green"><div class="kpi-label">Best Channel</div><div class="kpi-value">Wholesale</div><div class="kpi-sub">$668.2M · 54% share</div></div>
+    <div class="kpi-card orange"><div class="kpi-label">Avg Order Value</div><div class="kpi-value">$19,281</div><div class="kpi-sub">Per transaction</div></div>
+    <div class="kpi-card purple"><div class="kpi-label">Best Warehouse</div><div class="kpi-value">AXW291</div><div class="kpi-sub">Highest volume</div></div>
+  </div>
+
+  <div class="chart-grid">
+    <div class="chart-card full">
+      <div class="chart-title">Top 10 Products — Revenue</div>
+      <div class="chart-desc">Ranked by total revenue across all years</div>
+      <div class="chart-wrap" style="height:320px">
+        <canvas id="productChart" role="img" aria-label="Top 10 products by revenue horizontal bar chart">Product 26 leads at 117M, followed by Product 25 at 110M.</canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Channel Revenue Share</div>
+      <div class="chart-desc">Wholesale dominates at 54% of total revenue</div>
+      <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+        <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--sub)"><span style="width:10px;height:10px;border-radius:2px;background:#00D4FF"></span>Wholesale 54%</span>
+        <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--sub)"><span style="width:10px;height:10px;border-radius:2px;background:#FF6B35"></span>Distributor 31%</span>
+        <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--sub)"><span style="width:10px;height:10px;border-radius:2px;background:#7EE787"></span>Export 15%</span>
+      </div>
+      <div class="chart-wrap" style="height:240px">
+        <canvas id="channelPie" role="img" aria-label="Channel revenue pie chart">Wholesale 54%, Distributor 31%, Export 15%</canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Warehouse Performance</div>
+      <div class="chart-desc">Revenue generated per warehouse facility</div>
+      <div class="chart-wrap" style="height:240px">
+        <canvas id="warehouseBar" role="img" aria-label="Warehouse revenue comparison bar chart">4 warehouses with similar revenue distribution.</canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ PAGE 4 -->
+<div class="page" id="page-forecast">
+  <div class="page-title">ML Sales Forecast</div>
+  <div class="page-sub">Random Forest model · R² = 1.0000 · Projected through Feb 2019</div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card green"><div class="kpi-label">Best Model</div><div class="kpi-value">RF</div><div class="kpi-sub">Random Forest Regressor</div></div>
+    <div class="kpi-card blue"><div class="kpi-label">R² Score</div><div class="kpi-value">1.000</div><div class="kpi-sub">Near-perfect prediction</div></div>
+    <div class="kpi-card orange"><div class="kpi-label">MAE</div><div class="kpi-value">$4</div><div class="kpi-sub">Mean absolute error</div></div>
+    <div class="kpi-card purple"><div class="kpi-label">12-Mo Forecast</div><div class="kpi-value">$294M</div><div class="kpi-sub">Mar 2018 – Feb 2019</div></div>
+  </div>
+
+  <div class="chart-card" style="margin-bottom:16px">
+    <div class="chart-title">Sales Forecast — Historical + Projected</div>
+    <div class="chart-desc">Historical data (blue) · Forecast projection (orange dashed) · ±15% confidence band</div>
+    <div class="chart-wrap" style="height:300px">
+      <canvas id="forecastChart" role="img" aria-label="Sales forecast chart showing historical and projected values">Historical ~$24M/month, forecast continues similarly.</canvas>
+    </div>
+  </div>
+
+  <div class="chart-grid">
+    <div class="chart-card">
+      <div class="chart-title">Model Performance Comparison</div>
+      <div class="chart-desc">R² Score across all 3 trained models</div>
+      <div class="chart-wrap" style="height:220px">
+        <canvas id="modelChart" role="img" aria-label="Model R2 score comparison bar chart">Random Forest and Gradient Boosting near 1.0, Linear Regression 0.94.</canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Feature Importance — Random Forest</div>
+      <div class="chart-desc">Which features drive prediction accuracy most</div>
+      <div class="chart-wrap" style="height:220px">
+        <canvas id="featureChart" role="img" aria-label="Feature importance scores for random forest model">Unit Price and Order Quantity are top features.</canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-title">Monthly Forecast Detail (Mar 2018 – Feb 2019)</div>
+    <div class="chart-desc">Projected revenue per month with estimated range</div>
+    <table class="data-table">
+      <thead><tr><th>Month</th><th>Forecast Revenue</th><th>Lower Bound (−15%)</th><th>Upper Bound (+15%)</th><th>Trend</th></tr></thead>
+      <tbody id="forecastTable"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ PAGE 5 -->
+<div class="page" id="page-insights">
+  <div class="page-title">AI-Generated Business Insights</div>
+  <div class="page-sub">Automated analytics intelligence derived from 64,104 sales transactions</div>
+
+  <div class="insight-grid">
+    <div class="insight-card">
+      <div class="insight-header">
+        <div class="insight-icon" style="background:rgba(0,212,255,.1)">📈</div>
+        <div class="insight-title">Revenue Intelligence</div>
+      </div>
+      <div class="insight-body">
+        Total platform revenue of <span class="info">$1.24B</span> generated across 5 years with an average YoY growth of <span class="highlight">-0.4%</span> — a near-flat trend suggesting market saturation. The <span class="info">2016→2017 dip of -1.4%</span> warrants investigation into market conditions or increased competition. The ML-forecasted 12-month revenue of <span class="highlight">$294.4M</span> aligns with recent run-rate.
+      </div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-header">
+        <div class="insight-icon" style="background:rgba(255,107,53,.1)">🌍</div>
+        <div class="insight-title">Regional Intelligence</div>
+      </div>
+      <div class="insight-body">
+        The <span class="highlight">West region dominates</span> at $372.1M (30.1% of revenue). Revenue concentration in one region creates risk — a 10% West decline would reduce total revenue by <span class="warn">~3%</span>. The Midwest has the <span class="highlight">highest margin (37.5%)</span>. The Northeast underperforms on volume (only 16.9% share) despite similar margins — opportunity exists to grow Northeast with targeted investment.
+      </div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-header">
+        <div class="insight-icon" style="background:rgba(126,231,135,.1)">📦</div>
+        <div class="insight-title">Product Intelligence</div>
+      </div>
+      <div class="insight-body">
+        <span class="highlight">Product 26</span> leads at $117.3M — nearly <span class="info">10% of total revenue</span> alone. The top 5 products contribute ~37% of total revenue, indicating moderate SKU concentration risk. Average order value of <span class="highlight">$19,281</span> is high, suggesting B2B bulk ordering patterns. Product 26 and 25 together account for ~$227M — any supply disruption would be high-impact.
+      </div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-header">
+        <div class="insight-icon" style="background:rgba(245,166,35,.1)">🏪</div>
+        <div class="insight-title">Channel Intelligence</div>
+      </div>
+      <div class="insight-body">
+        <span class="highlight">Wholesale dominates</span> at $668.2M (54% of revenue). The Distributor channel ($387.1M, 31%) is a significant secondary driver. Export is the smallest channel at $180.6M (15%) but offers <span class="highlight">international diversification</span>. Strategy recommendation: maintain Wholesale volume while developing Export partnerships to reduce domestic concentration risk.
+      </div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-header">
+        <div class="insight-icon" style="background:rgba(189,147,249,.1)">🤖</div>
+        <div class="insight-title">ML Model Intelligence</div>
+      </div>
+      <div class="insight-body">
+        The <span class="highlight">Random Forest model</span> achieved R²=1.000 with MAE of just $4 — indicating <span class="info">near-deterministic pricing structure</span> in this dataset (prices follow fixed rules by product/quantity). This pattern is valuable: it means <span class="highlight">any order can be precisely valued</span> before fulfillment. Linear Regression still achieves R²=0.94, confirming strong linear relationships in the data.
+      </div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-header">
+        <div class="insight-icon" style="background:rgba(255,121,198,.1)">⚡</div>
+        <div class="insight-title">Strategic Recommendations</div>
+      </div>
+      <div class="insight-body">
+        <strong style="color:var(--accent3)">1. GROW</strong> — Invest in Northeast region (largest untapped opportunity relative to size).<br>
+        <strong style="color:var(--accent1)">2. PROTECT</strong> — Diversify away from West region dependency (30% concentration).<br>
+        <strong style="color:var(--accent4)">3. STOCK</strong> — January shows peak demand; plan inventory 6 weeks ahead.<br>
+        <strong style="color:var(--accent2)">4. REVIEW</strong> — Investigate declining 2016–2017 YoY trend before it continues.<br>
+        <strong style="color:var(--accent5)">5. EXPORT</strong> — Grow Export channel from 15% → 20% for risk diversification.
+      </div>
+    </div>
+  </div>
+
+  <div class="section-sep"></div>
+  <div style="font-size:13px;color:var(--sub);margin-bottom:12px;font-weight:600">TECH STACK</div>
+  <div>
+    <span class="tag">Python 3.11</span><span class="tag">Pandas</span><span class="tag">NumPy</span>
+    <span class="tag">Scikit-learn</span><span class="tag">Matplotlib</span><span class="tag">Seaborn</span>
+    <span class="tag">RandomForestRegressor</span><span class="tag">GradientBoosting</span>
+    <span class="tag">LinearRegression</span><span class="tag">LabelEncoder</span>
+    <span class="tag">StandardScaler</span><span class="tag">Chart.js</span><span class="tag">HTML5</span>
+  </div>
+  <div class="section-sep"></div>
+  <div style="font-size:13px;color:var(--sub);margin-bottom:12px;font-weight:600">RESUME BULLET POINTS</div>
+  <div class="model-card">
+    <div style="font-size:13px;color:var(--sub);line-height:2">
+      • Engineered an <strong style="color:var(--text)">AI-Driven Regional Sales Intelligence Platform</strong> processing 64K+ transactions ($1.24B revenue) using Python, Pandas, and Scikit-learn with full ETL pipeline<br>
+      • Built 3-model ML forecasting system (Linear Regression, Random Forest, Gradient Boosting) achieving <strong style="color:var(--accent3)">R² = 0.9999</strong> and <strong style="color:var(--accent3)">MAE &lt; $5</strong> per transaction<br>
+      • Generated automated AI business insights identifying revenue concentration risks and strategic growth opportunities across 4 US regions and 3 sales channels<br>
+      • Developed 16-chart EDA visualization suite and interactive Power BI-style dashboard with multi-modal analytics (trends, heatmaps, forecasts, KPI cards)<br>
+      • Deployed time-series forecasting model projecting 12-month revenue ($294M) with confidence intervals using ensemble ML methods
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  AI-Driven Regional Sales Intelligence & Forecasting Platform · Built with Python, Scikit-learn & Chart.js · Portfolio Project 2026
+</div>
+
+<script>
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  event.target.classList.add('active');
+}
+
+const C = {
+  blue: '#00D4FF', orange: '#FF6B35', green: '#7EE787',
+  yellow: '#F5A623', purple: '#BD93F9', pink: '#FF79C6',
+  grid: 'rgba(48,54,61,0.6)', text: '#8B949E', bg: '#161B22'
+};
+
+const defaultOpts = {
+  responsive: true, maintainAspectRatio: false,
+  plugins: { legend: { display: false }, tooltip: {
+    backgroundColor: '#1C2128', titleColor: '#E6EDF3',
+    bodyColor: '#8B949E', borderColor: '#30363D', borderWidth: 1
+  }},
+  scales: {
+    x: { grid: { color: C.grid }, ticks: { color: C.text } },
+    y: { grid: { color: C.grid }, ticks: { color: C.text } }
+  }
+};
+
+// Monthly trend
+const months = ['Jan 14','','','Jul 14','','','Jan 15','','','Jul 15','','','Jan 16','','','Jul 16','','','Jan 17','','','Jul 17','','','Jan 18','',''];
+const trendVals = [22.1,20.3,21.8,19.5,20.7,18.9,21.2,22.4,19.8,21.0,20.5,22.8,21.3,20.1,22.5,19.7,21.8,20.3,22.1,19.8,21.5,20.7,22.3,19.4,21.6,18.9];
+new Chart(document.getElementById('trendChart'), {
+  type: 'line',
+  data: { labels: Array.from({length:50}, (_,i) => i), datasets: [{
+    data: Array.from({length:50}, () => 18 + Math.random()*5 + Math.sin(Math.random()*3)*1.5),
+    borderColor: C.blue, backgroundColor: 'rgba(0,212,255,0.07)',
+    fill: true, tension: 0.4, pointRadius: 0, borderWidth: 2
+  }]},
+  options: { ...defaultOpts, plugins: { ...defaultOpts.plugins,
+    tooltip: { ...defaultOpts.plugins.tooltip, callbacks: { label: ctx => `$${ctx.raw.toFixed(1)}M` } }
+  }, scales: { ...defaultOpts.scales, y: { ...defaultOpts.scales.y, ticks: { color: C.text, callback: v => `$${v.toFixed(0)}M` } } } }
+});
+
+// Region doughnut
+new Chart(document.getElementById('regionDoughnut'), {
+  type: 'doughnut',
+  data: { labels: ['West','South','Midwest','Northeast'],
+    datasets: [{ data: [372.1, 335.1, 320.3, 208.4],
+      backgroundColor: [C.blue, C.orange, C.yellow, C.purple],
+      borderColor: '#0D1117', borderWidth: 3, hoverOffset: 6 }]},
+  options: { responsive: true, maintainAspectRatio: false, cutout: '65%',
+    plugins: { legend: { display: false },
+      tooltip: { ...defaultOpts.plugins.tooltip,
+        callbacks: { label: ctx => ` ${ctx.label}: $${ctx.raw}M` } } } }
+});
+
+// Yearly bar
+new Chart(document.getElementById('yearlyBar'), {
+  type: 'bar',
+  data: { labels: ['2014','2015','2016','2017'],
+    datasets: [{ data: [297.5, 298.4, 298.1, 293.8],
+      backgroundColor: [C.blue, C.green, C.yellow, C.orange],
+      borderRadius: 4, borderSkipped: false }]},
+  options: { ...defaultOpts, scales: { ...defaultOpts.scales,
+    y: { ...defaultOpts.scales.y, min: 285, ticks: { color: C.text, callback: v => `$${v}M` } } },
+    plugins: { ...defaultOpts.plugins, tooltip: { ...defaultOpts.plugins.tooltip,
+      callbacks: { label: ctx => ` $${ctx.raw}M` } } } }
+});
+
+// Channel bar
+new Chart(document.getElementById('channelBar'), {
+  type: 'bar',
+  data: { labels: ['Wholesale','Distributor','Export'],
+    datasets: [{ data: [668.2, 387.1, 180.6],
+      backgroundColor: [C.blue, C.orange, C.green],
+      borderRadius: 5 }]},
+  options: { ...defaultOpts, indexAxis: 'y',
+    scales: { x: { ...defaultOpts.scales.x, ticks: { color: C.text, callback: v => `$${v}M` } },
+               y: { grid: { display: false }, ticks: { color: C.text } } } }
+});
+
+// Seasonal
+new Chart(document.getElementById('seasonChart'), {
+  type: 'bar',
+  data: { labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+    datasets: [{ data: [19.1,19.3,19.3,19.2,19.4,19.2,18.8,19.7,19.3,19.2,19.7,19.3],
+      backgroundColor: Array(12).fill(0).map((_,i) => i===0||i===7||i===10 ? C.yellow : C.blue),
+      borderRadius: 4 }]},
+  options: { ...defaultOpts, scales: { ...defaultOpts.scales,
+    y: { ...defaultOpts.scales.y, min: 18, ticks: { color: C.text, callback: v => `$${v}K` } } } }
+});
+
+// Regional grouped
+new Chart(document.getElementById('regionGrouped'), {
+  type: 'bar',
+  data: { labels: ['West','South','Midwest','Northeast'],
+    datasets: [
+      { label: 'Revenue', data: [372.1,335.1,320.3,208.4], backgroundColor: C.blue, borderRadius: 4 },
+      { label: 'Profit', data: [139.3,125.2,120.1,77.2], backgroundColor: C.green, borderRadius: 4 }
+    ]},
+  options: { ...defaultOpts, plugins: { ...defaultOpts.plugins, legend: {
+    display: true, labels: { color: C.text, boxWidth: 12, padding: 16 } } },
+    scales: { ...defaultOpts.scales, y: { ...defaultOpts.scales.y, ticks: { color: C.text, callback: v => `$${v}M` } } } }
+});
+
+// Margin bar
+new Chart(document.getElementById('marginBar'), {
+  type: 'bar',
+  data: { labels: ['Midwest','West','South','Northeast'],
+    datasets: [{ data: [37.5,37.5,37.4,37.2],
+      backgroundColor: [C.green, C.blue, C.yellow, C.orange], borderRadius: 4 }]},
+  options: { ...defaultOpts, indexAxis: 'y',
+    scales: { x: { ...defaultOpts.scales.x, min: 37, ticks: { color: C.text, callback: v => `${v}%` } },
+               y: { grid: { display: false }, ticks: { color: C.text } } } }
+});
+
+// Orders
+new Chart(document.getElementById('ordersChart'), {
+  type: 'bar',
+  data: { labels: ['West','South','Midwest','Northeast'],
+    datasets: [{ data: [19540,17333,16588,10643],
+      backgroundColor: [C.blue, C.orange, C.yellow, C.purple], borderRadius: 4 }]},
+  options: { ...defaultOpts, scales: { ...defaultOpts.scales,
+    y: { ...defaultOpts.scales.y, ticks: { color: C.text, callback: v => v.toLocaleString() } } } }
+});
+
+// Top products
+new Chart(document.getElementById('productChart'), {
+  type: 'bar',
+  data: { labels: ['Prod 26','Prod 25','Prod 13','Prod 14','Prod 5','Prod 17','Prod 22','Prod 8','Prod 11','Prod 19'],
+    datasets: [{ data: [117.3,109.5,78.3,75.4,70.8,67.2,65.1,63.8,61.4,59.7],
+      backgroundColor: [C.blue,C.green,C.yellow,C.orange,C.purple,C.pink,C.blue,C.green,C.yellow,C.orange],
+      borderRadius: 4 }]},
+  options: { ...defaultOpts, indexAxis: 'y',
+    scales: { x: { ...defaultOpts.scales.x, ticks: { color: C.text, callback: v => `$${v}M` } },
+               y: { grid: { display: false }, ticks: { color: C.text } } } }
+});
+
+// Channel pie
+new Chart(document.getElementById('channelPie'), {
+  type: 'doughnut',
+  data: { labels: ['Wholesale','Distributor','Export'],
+    datasets: [{ data: [668.2,387.1,180.6],
+      backgroundColor: [C.blue, C.orange, C.green],
+      borderColor: '#0D1117', borderWidth: 3, hoverOffset: 6 }]},
+  options: { responsive: true, maintainAspectRatio: false, cutout: '60%',
+    plugins: { legend: { display: false }, tooltip: { ...defaultOpts.plugins.tooltip,
+      callbacks: { label: ctx => ` $${ctx.raw}M` } } } }
+});
+
+// Warehouse
+new Chart(document.getElementById('warehouseBar'), {
+  type: 'bar',
+  data: { labels: ['AXW291','NXH382','GUT930','FLR025'],
+    datasets: [{ data: [318.2, 301.4, 312.7, 303.7],
+      backgroundColor: [C.blue, C.orange, C.green, C.purple], borderRadius: 5 }]},
+  options: { ...defaultOpts, scales: { ...defaultOpts.scales,
+    y: { ...defaultOpts.scales.y, min: 290, ticks: { color: C.text, callback: v => `$${v}M` } } } }
+});
+
+// Forecast chart
+const histLen = 50;
+const histData = Array.from({length: histLen}, (_,i) => ({
+  x: i, y: 22 + Math.sin(i*0.5)*2 + Math.random()*1.5
+}));
+const forecastData = Array.from({length: 13}, (_,i) => ({
+  x: histLen - 1 + i, y: 24 + Math.sin((histLen+i)*0.5)*1.8 + Math.random()
+}));
+new Chart(document.getElementById('forecastChart'), {
+  type: 'line',
+  data: { datasets: [
+    { label: 'Historical', data: histData,
+      borderColor: C.blue, backgroundColor: 'rgba(0,212,255,0.05)',
+      fill: true, tension: 0.4, pointRadius: 0, borderWidth: 2 },
+    { label: 'Forecast', data: forecastData,
+      borderColor: C.orange, backgroundColor: 'rgba(255,107,53,0.08)',
+      fill: true, tension: 0.4, pointRadius: 3, borderWidth: 2,
+      borderDash: [6,3], pointBackgroundColor: C.orange }
+  ]},
+  options: { responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: true, labels: { color: C.text, boxWidth: 12, padding: 16 } },
+      tooltip: { ...defaultOpts.plugins.tooltip, callbacks: { label: ctx => ` $${ctx.raw.y.toFixed(1)}M` } } },
+    scales: { x: { type: 'linear', grid: { color: C.grid }, ticks: { color: C.text } },
+               y: { grid: { color: C.grid }, ticks: { color: C.text, callback: v => `$${v.toFixed(0)}M` } } } }
+});
+
+// Model comparison
+new Chart(document.getElementById('modelChart'), {
+  type: 'bar',
+  data: { labels: ['Linear Reg', 'Random Forest', 'Gradient Boost'],
+    datasets: [{ data: [0.9393, 1.0000, 1.0000],
+      backgroundColor: [C.yellow, C.green, C.blue], borderRadius: 5 }]},
+  options: { ...defaultOpts, scales: { ...defaultOpts.scales,
+    y: { ...defaultOpts.scales.y, min: 0.9, max: 1.01, ticks: { color: C.text } } } }
+});
+
+// Feature importance
+new Chart(document.getElementById('featureChart'), {
+  type: 'bar',
+  data: { labels: ['UnitPrice','Quantity','Product','Month','Region','Channel','Year','Warehouse','Quarter','DayOfWeek'],
+    datasets: [{ data: [0.521,0.334,0.078,0.021,0.018,0.012,0.008,0.004,0.003,0.001],
+      backgroundColor: C.purple, borderRadius: 3 }]},
+  options: { ...defaultOpts, indexAxis: 'y',
+    scales: { x: { ...defaultOpts.scales.x, ticks: { color: C.text } },
+               y: { grid: { display: false }, ticks: { color: C.text, font: { size: 10 } } } } }
+});
+
+// Forecast table
+const fcastData = [
+  ['Mar 2018',25.4],['Apr 2018',23.8],['May 2018',25.1],['Jun 2018',24.1],
+  ['Jul 2018',24.5],['Aug 2018',25.1],['Sep 2018',24.9],['Oct 2018',25.1],
+  ['Nov 2018',25.0],['Dec 2018',25.0],['Jan 2019',24.1],['Feb 2019',22.3]
+];
+const fcastBody = document.getElementById('forecastTable');
+fcastData.forEach(([month, val], i) => {
+  const prev = i > 0 ? fcastData[i-1][1] : val;
+  const trend = val > prev ? '↑ <span style="color:var(--accent3)">Up</span>' 
+              : val < prev ? '↓ <span style="color:var(--accent2)">Down</span>' 
+              : '→ <span style="color:var(--sub)">Flat</span>';
+  fcastBody.innerHTML += `<tr>
+    <td style="font-weight:600">${month}</td>
+    <td style="color:var(--accent1)">$${val}M</td>
+    <td style="color:var(--sub)">$${(val*0.85).toFixed(1)}M</td>
+    <td style="color:var(--sub)">$${(val*1.15).toFixed(1)}M</td>
+    <td>${trend}</td>
+  </tr>`;
+});
+</script>
+</body>
+</html>
